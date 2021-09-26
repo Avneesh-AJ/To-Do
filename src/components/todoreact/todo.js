@@ -1,13 +1,38 @@
 import React ,{useState , useEffect} from 'react';
 import "./style.css";
-
+//Useing local storage to save the data permanently
+const getLocalData =() =>{
+    const list =localStorage.getItem("myTodoList");
+    if (list) {
+        return JSON.parse(list);
+    }
+    else{
+        return [];
+    }
+}
 const Todo = () => {
     const [inputData, setInputData]=useState("");
-    const [items,setItems] = useState([]);
+    const [items,setItems] = useState(getLocalData());
+    const [isEditItem , setIsEditItem] =useState("");
+    const [toggleButton ,setToggleButton] =useState(false);
+
     //add items function
     const addItems=() => {
         if (! inputData){
-            alert("Don't be lazy create and do some task")
+            alert("Don't be lazy create and do some task");
+        }
+        else if (inputData && toggleButton) {
+            setItems(
+                items.map((currElem) => {
+                if(currElem.id === isEditItem ) {
+                    return{...currElem, name:inputData};
+                }
+                return currElem;
+            })
+            );
+            setInputData("");
+            setIsEditItem(null);
+            setToggleButton(false);
         }
         else{
             const myNewInputData ={
@@ -19,6 +44,16 @@ const Todo = () => {
 
         }
     };
+    //edit the items
+
+    const editItem =(index) => {
+        const item_todo_edited =items.find( (currElem) =>{
+            return currElem.id === index;
+        });
+        setInputData(item_todo_edited.name);
+        setIsEditItem(index);
+        setToggleButton(true);
+    }
     //how to delete item
 
     const deleteItem =(index) =>{
@@ -31,6 +66,9 @@ const Todo = () => {
                setItems([]);
     };
     //adding local storage functionality
+    useEffect (() => {
+        localStorage.setItem("myTodoList", JSON.stringify(items));
+    } ,[items]);
     return (
         <><div className ="main-div">
             <div className="child-div">
@@ -45,7 +83,14 @@ const Todo = () => {
                     value={inputData}
                     onChange={(event) => setInputData(event.target.value)}
                     />
-                    <i className="fa fa-plus add-btn" onClick={addItems}></i>
+                    { toggleButton ? (
+                        <i className="far fa-edit add-btn" onClick={addItems}></i>
+                    ) :(
+                        <i className="fa fa-plus add-btn" onClick={addItems}></i>
+                    )
+                    }
+                   
+                    
                 </div>
 
                 {/* show our items*/}
@@ -57,7 +102,7 @@ const Todo = () => {
                         <div className="eachItem" key={currElem.id}>
                         <h3>{currElem.name}</h3>
                         <div className="todo-btn">
-                        <i className="far fa-edit add-btn"></i>
+                        <i className="far fa-edit add-btn" onClick={() => editItem(currElem.id)}></i>
                         <i className="far fa-trash-alt add-btn" onClick={() =>
                         deleteItem(currElem.id)}></i>
 
