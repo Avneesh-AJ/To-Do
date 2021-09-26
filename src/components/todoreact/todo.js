@@ -10,10 +10,23 @@ const Todo = () => {
             alert("Don't be lazy create and do some task")
         }
         else{
-            setItems([...items,inputData])
-            setInputData("")
+            const myNewInputData ={
+                id : new Date().getTime().toString(),
+                name : inputData,
+            }
+            setItems([...items,myNewInputData])
+            setInputData("");
+
         }
-    }
+    };
+    //how to delete item
+
+    const deleteItem =(index) =>{
+     const updatedItems =items.filter((currElem)=>{
+         return currElem.id !==index;
+     });
+     setItems(updatedItems);
+    };
     return (
         <><div className ="main-div">
             <div className="child-div">
@@ -34,14 +47,15 @@ const Todo = () => {
                 {/* show our items*/}
                 <div className="showItems">
 
-                    {items.map((currElem, index) => {
+                    {items.map((currElem, ) => {
                      return (
 
-                        <div className="eachItem" key={index}>
-                        <h3>{currElem}</h3>
+                        <div className="eachItem" key={currElem.id}>
+                        <h3>{currElem.name}</h3>
                         <div className="todo-btn">
                         <i className="far fa-edit add-btn"></i>
-                        <i className="far fa-trash-alt add-btn"></i>
+                        <i className="far fa-trash-alt add-btn" onClick={() =>
+                        deleteItem(currElem.id)}></i>
 
                         </div>
                         </div>
